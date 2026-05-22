@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proiezione live — {{ comune }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/display.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="display-body" data-session="{{ session_id }}" data-poll="{{ poll_ms }}" data-sezioni-preview="{{ sezioni_preview }}">
+  <div class="display-bg"></div>
+  <div class="display-shell">
+    <header class="display-header">
+      <div class="logo-wrap" id="logo-wrap">
+        <img id="comune-logo" class="comune-logo hidden" alt="Stemma comune">
+        <div id="logo-placeholder" class="logo-placeholder">🏛️</div>
+      </div>
+      <div class="header-text">
+        <p class="eyebrow">Elezioni comunali · Proiezione indicativa</p>
+        <h1 id="comune-name">{{ comune }}</h1>
+        <p class="tipo" id="tipo-label"></p>
+      </div>
+      <div class="live-badge" id="live-badge">
+        <span class="pulse"></span>
+        <span>DIRETTA</span>
+      </div>
+    </header>
+
+    <main class="display-main">
+      <aside class="sidebar">
+        <section class="panel scrutinio-panel">
+          <h2>Scrutinio</h2>
+          <div class="scrutinio-compact">
+            <div class="scrutinio-ring">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                <circle class="ring-fg" id="ring-fg" cx="60" cy="60" r="52"/>
+              </svg>
+              <div class="ring-label">
+                <span id="avanzamento-pct" class="ring-pct">0</span><span class="ring-unit">%</span>
+              </div>
+            </div>
+            <div class="scrutinio-meta">
+              <p class="schede-count">
+                <span id="schede-scrutinate">0</span> / <span id="schede-totali">0</span>
+              </p>
+              <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <p class="updated-at"><span id="updated-at">—</span></p>
+            </div>
+          </div>
+        </section>
+        <section class="panel sezioni-panel">
+          <div class="sezioni-panel-head">
+            <h2>Sezioni</h2>
+            <button type="button" id="btn-sezioni-tutte" class="btn-sezioni-expand" hidden>
+              Tutte (<span id="sezioni-count">0</span>)
+            </button>
+          </div>
+          <div id="sezioni-preview" class="sezioni-preview"></div>
+        </section>
+        <section class="panel esito-panel">
+          <h2>Esito</h2>
+          <div id="esito-badge" class="esito-badge esito-incerto">In attesa dati…</div>
+          <div id="ballottaggio-box" class="ballottaggio-box hidden"></div>
+        </section>
+      </aside>
+
+      <section class="panel candidati-panel">
+        <h2 class="candidati-title">Candidati</h2>
+        <div id="candidati-list" class="candidati-list"></div>
+      </section>
+    </main>
+  </div>
+  <div id="sezioni-overlay" class="sezioni-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="overlay-sezioni-title">
+    <div class="sezioni-overlay-backdrop" id="sezioni-overlay-close"></div>
+    <div class="sezioni-overlay-box">
+      <header class="sezioni-overlay-header">
+        <h2 id="overlay-sezioni-title">Tutte le sezioni elettorali</h2>
+        <button type="button" class="btn-overlay-close" id="btn-overlay-chiudi" aria-label="Chiudi">✕</button>
+      </header>
+      <div id="sezioni-overlay-grid" class="sezioni-overlay-grid"></div>
+    </div>
+  </div>
+  <footer class="display-footer">
+    Proiezione statistica non ufficiale · Non sostituisce il verbale di seggio
+  </footer>
+  <script src="{{ url_for('static', filename='js/display-live.js') }}"></script>
+</body>
+</html>

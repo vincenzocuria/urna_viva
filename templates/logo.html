@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Logo — {{ scr.meta.comune }}{% endblock %}
+{% block nav %}
+<nav class="tabs">
+  <a href="{{ url_for('scrutiny.dashboard', session_id=scr.id) }}">Dashboard</a>
+  <a href="{{ url_for('scrutiny.inserimento', session_id=scr.id) }}">Inserimento</a>
+  <a href="{{ url_for('logo.logo_settings', session_id=scr.id) }}" class="active">Logo</a>
+  <a href="{{ url_for('display.proiezione_tv', session_id=scr.id) }}" target="_blank" rel="noopener">Proiezione TV ↗</a>
+  <a href="{{ url_for('home.index') }}">Home</a>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Logo del comune — {{ scr.meta.comune }}</h2>
+  <p>Carica PNG, JPG, WEBP, GIF, SVG o BMP. Ritaglia e adatta per la schermata di proiezione.</p>
+  {% if request.args.get('err') == 'formato' %}
+  <div class="alert alert-error">Formato file non supportato.</div>
+  {% elif request.args.get('err') == 'missing' %}
+  <div class="alert alert-error">Carica prima un'immagine.</div>
+  {% endif %}
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>Anteprima attuale</h3>
+    <div class="logo-preview-box">
+      {% if logos.display %}
+      <img src="{{ logos.display }}" alt="Logo comune" class="logo-preview-img">
+      {% else %}
+      <p class="muted">Nessun logo impostato</p>
+      {% endif %}
+    </div>
+    {% if logos.display %}
+    <form method="post" action="{{ url_for('logo.delete_logo', session_id=scr.id) }}" style="margin-top:1rem">
+      <button type="submit" class="btn btn-secondary">Elimina logo</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Carica nuovo file</h3>
+    <form method="post" action="{{ url_for('logo.upload_logo', session_id=scr.id) }}" enctype="multipart/form-data">
+      <input type="file" name="logo" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.bmp" required>
+      <button type="submit" class="btn">Carica</button>
+    </form>
+    <p><small>Max 8 MB</small></p>
+  </div>
+</div>
+
+{% if pending %}
+<div class="card">
+  <h3>Ritaglio e adattamento</h3>
+  {% if is_svg %}
+  <p class="alert alert-warn">SVG caricato: clicca Applica per adattarlo alla proiezione.</p>
+  {% else %}
+  <div class="crop-container">
+    <img id="crop-image" src="{{ original_url }}" alt="Ritaglia" style="max-width:100%;display:block">
+  </div>
+  {% endif %}
+  <form method="post" action="{{ url_for('logo.apply_logo', session_id=scr.id) }}" id="crop-form">
+    <input type="hidden" name="crop_x" id="crop_x">
+    <input type="hidden" name="crop_y" id="crop_y">
+    <input type="hidden" name="crop_w" id="crop_w">
+    <input type="hidden" name="crop_h" id="crop_h">
+    <label>Adattamento</label>
+    <select name="fit">
+      <option value="cover">Riempi (cover)</option>
+      <option value="contain">Contieni (contain)</option>
+    </select>
+    <button type="submit" class="btn" style="margin-top:1rem">Applica e salva</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card">
+  <h3>Proiezione su secondo monitor</h3>
+  <p>Apri la pagina TV su un altro schermo: si aggiorna automaticamente ogni pochi secondi mentre inserisci i dati.</p>
+  <a href="{{ url_for('display.proiezione_tv', session_id=scr.id) }}" target="_blank" class="btn" rel="noopener">
+    Apri Proiezione TV ↗
+  </a>
+  <button type="button" class="btn btn-secondary" onclick="openTvFullscreen()">Apri a schermo intero</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="{{ url_for('static', filename='js/logo-crop.js') }}"></script>
+<script>
+function openTvFullscreen() {
+  const w = window.open('{{ url_for("display.proiezione_tv", session_id=scr.id) }}', 'proiezione_tv', 'fullscreen=yes,width=1920,height=1080');
+  if (w) w.addEventListener('load', () => { try { w.document.documentElement.requestFullscreen(); } catch(e) {} });
+}
+</script>
+{% endblock %}

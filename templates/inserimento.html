@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Inserimento — {{ scr.meta.comune }}{% endblock %}
+{% block nav %}
+{% with active='inserimento' %}
+{% include 'includes/nav_scrutinio.html' %}
+{% endwith %}
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>{{ scr.meta.comune }} — Inserimento parziali</h2>
+  <p class="muted">
+    I conteggi si aggiornano da soli: <strong>schede scrutinate</strong> = validi + nulli + contestati + bianche.
+    Inserendo le scrutinate, i validi si impostano uguali se non ci sono schede nulle/bianche.
+    <a href="{{ url_for('candidati.modifica_candidati', session_id=scr.id) }}">Modifica candidati</a>
+  </p>
+  <form method="post" action="{{ url_for('scrutiny.set_modalita', session_id=scr.id) }}" style="display:inline">
+    <label>Modalità attiva</label>
+    <select name="modalita" onchange="this.form.submit()">
+      <option value="sezione" {% if scr.modalita_inserimento == 'sezione' %}selected{% endif %}>Per sezione</option>
+      <option value="cumulativo" {% if scr.modalita_inserimento == 'cumulativo' %}selected{% endif %}>Cumulativo</option>
+    </select>
+  </form>
+  {% if not validazione.valid %}
+  <div class="alert alert-error" style="margin-top:1rem">
+    {% for e in validazione.errors %}<div>{{ e }}</div>{% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div id="tab-sezione" class="{% if scr.modalita_inserimento != 'sezione' %}hidden{% endif %}">
+  {% for sec in scr.sezioni %}
+  <div class="card section-form">
+    <h3>{{ sec.nome }} ({{ sec.elettori }} elettori)</h3>
+    <form method="post" action="{{ url_for('scrutiny.salva_sezione', session_id=scr.id) }}" class="inserimento-form">
+      <input type="hidden" name="sezione_id" value="{{ sec.id }}">
+      <div class="grid-2">
+        <div>
+          <label>Schede scrutinate</label>
+          <input type="number" name="schede_scrutinate" value="{{ sec.schede_scrutinate }}" min="0" max="{{ sec.elettori }}">
+        </div>
+        <div>
+          <label>Voti validi</label>
+          <input type="number" name="voti_validi" value="{{ sec.voti_validi }}" min="0">
+        </div>
+        <div>
+          <label>Nulli</label>
+          <input type="number" name="nulli" value="{{ sec.nulli }}" min="0">
+        </div>
+        <div>
+          <label>Contestati</label>
+          <input type="number" name="contestati" value="{{ sec.contestati }}" min="0">
+        </div>
+        <div>
+          <label>Bianche</label>
+          <input type="number" name="bianche" value="{{ sec.bianche }}" min="0">
+        </div>
+      </div>
+      <p class="sync-riepilogo muted"></p>
+      <h4>Voti per candidato</h4>
+      <div class="grid-2">
+        {% for c in scr.candidati %}
+        <div>
+          <label>{{ c.nome }}{% if c.lista %} ({{ c.lista }}){% endif %}</label>
+          <input type="number" name="voto_{{ c.id }}" value="{{ sec.voti[c.id] }}" min="0">
+        </div>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-small">Salva sezione</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+
+<div id="tab-cumulativo" class="card {% if scr.modalita_inserimento != 'cumulativo' %}hidden{% endif %}">
+  <h3>Totali cumulativi</h3>
+  <form method="post" action="{{ url_for('scrutiny.salva_cumulativo', session_id=scr.id) }}" class="inserimento-form">
+    {% set cum = scr.cumulativo %}
+    <div class="grid-2">
+      <div>
+        <label>Schede scrutinate (totale)</label>
+        <input type="number" name="schede_scrutinate" value="{{ cum.schede_scrutinate }}" min="0">
+      </div>
+      <div>
+        <label>Voti validi</label>
+        <input type="number" name="voti_validi" value="{{ cum.voti_validi }}" min="0">
+      </div>
+      <div>
+        <label>Nulli</label>
+        <input type="number" name="nulli" value="{{ cum.nulli }}" min="0">
+      </div>
+      <div>
+        <label>Contestati</label>
+        <input type="number" name="contestati" value="{{ cum.contestati }}" min="0">
+      </div>
+      <div>
+        <label>Bianche</label>
+        <input type="number" name="bianche" value="{{ cum.bianche }}" min="0">
+      </div>
+    </div>
+    <p class="sync-riepilogo muted"></p>
+    <h4>Voti per candidato</h4>
+    <div class="grid-2">
+      {% for c in scr.candidati %}
+      <div>
+        <label>{{ c.nome }}</label>
+        <input type="number" name="voto_{{ c.id }}" value="{{ cum.voti[c.id] }}" min="0">
+      </div>
+      {% endfor %}
+    </div>
+    <div>
+      <label><input type="checkbox" name="salva_snapshot" value="1"> Salva snapshot nello storico</label>
+      <input type="text" name="nota_snapshot" placeholder="Nota opzionale (es. ore 22:00)">
+    </div>
+    <button type="submit" class="btn">Salva cumulativo</button>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/inserimento-sync.js') }}"></script>
+{% endblock %}

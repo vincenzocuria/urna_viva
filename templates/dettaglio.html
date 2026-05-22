@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Dettaglio sezioni — {{ scr.meta.comune }}{% endblock %}
+{% block nav %}
+{% with active='dettaglio' %}
+{% include 'includes/nav_scrutinio.html' %}
+{% endwith %}
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Dettaglio sezioni — {{ scr.meta.comune }}</h2>
+  <p class="muted">{{ dettaglio.metodo }} · Zone definite: {% if dettaglio.zone %}{{ dettaglio.zone|join(', ') }}{% else %}nessuna (usa media globale){% endif %}</p>
+  {% if not validazione.valid %}
+  <div class="alert alert-error">{% for e in validazione.errors %}<div>{{ e }}</div>{% endfor %}</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Riepilogo proiettato (schede)</h3>
+  <div class="grid-2 dettaglio-riepilogo">
+    <div><span class="muted">Scrutinate</span><br><strong>{{ proiezione.schede_scrutinate }}</strong> / {{ proiezione.schede_totali }}</div>
+    <div><span class="muted">Schede proiettate (stima)</span><br><strong>{{ proiezione.schede_proiettate or proiezione.schede_totali }}</strong></div>
+    <div><span class="muted">Nulli proiettati</span><br><strong>{{ proiezione.nulli_proiettati or 0 }}</strong> (reali: {{ proiezione.nulli }})</div>
+    <div><span class="muted">Bianche proiettate</span><br><strong>{{ proiezione.bianche_proiettate or 0 }}</strong> (reali: {{ proiezione.bianche }})</div>
+    <div><span class="muted">Contestati proiettati</span><br><strong>{{ proiezione.contestati_proiettati or 0 }}</strong> (reali: {{ proiezione.contestati }})</div>
+    <div><span class="muted">Voti validi proiettati</span><br><strong>{{ proiezione.voti_validi_proiettati|int }}</strong></div>
+  </div>
+  {% if proiezione.esito.stato == 'ballottaggio' %}
+  <p class="alert alert-warn" style="margin-top:1rem">{{ proiezione.esito.messaggio }}</p>
+  {% endif %}
+</div>
+
+<div class="card table-scroll">
+  <h3>Tutte le sezioni</h3>
+  <table class="table-dettaglio">
+    <thead>
+      <tr>
+        <th>Sezione</th>
+        <th>Zona</th>
+        <th>Elettori</th>
+        <th>Scrutinate</th>
+        <th>%</th>
+        <th>Validi</th>
+        <th>Nulli</th>
+        <th>Bianche</th>
+        {% for c in scr.candidati %}
+        <th>{{ c.nome }}</th>
+        {% endfor %}
+        <th>Stima</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in dettaglio.righe %}
+      <tr class="{% if not r.ha_dati %}row-inattiva{% endif %}">
+        <td><strong>{{ r.nome }}</strong></td>
+        <td>{{ r.zona }}</td>
+        <td>{{ r.elettori }}</td>
+        <td>{{ r.schede_scrutinate }}</td>
+        <td>{{ r.avanzamento_pct }}%</td>
+        <td>{{ r.voti_validi }}</td>
+        <td>{{ r.nulli }}<br><small class="muted">proj. {{ r.nulli_proiettati }}</small></td>
+        <td>{{ r.bianche }}<br><small class="muted">proj. {{ r.bianche_proiettate }}</small></td>
+        {% for c in scr.candidati %}
+        <td>
+          {{ r.voti[c.id] }}
+          <br><small class="muted">{{ r.quote_pct[c.id] }}% · proj. {{ r.voti_proiettati[c.id] }}</small>
+        </td>
+        {% endfor %}
+        <td>{% if r.usa_media_zona %}<span class="badge-zona">media zona</span>{% elif r.ha_dati %}reale{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="muted">Sezioni senza dati: la stima usa la media delle sezioni già arrivate nella stessa <strong>zona</strong>, oppure la media globale.</p>
+{% endblock %}

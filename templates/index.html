@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Home — Comunali Proiettore{% endblock %}
+{% block content %}
+<div class="card">
+  <p>
+    <a href="{{ url_for('home.setup') }}" class="btn">Nuovo scrutinio</a>
+    <a href="{{ url_for('settings.impostazioni') }}" class="btn btn-secondary">Impostazioni</a>
+  </p>
+</div>
+{% if sessions %}
+<div class="card">
+  <h2>Scrutini salvati</h2>
+  <ul class="session-list">
+    {% for s in sessions %}
+    <li class="session-item">
+      <div class="session-info">
+        <strong>{{ s.comune }}</strong>
+        <span class="session-meta">— {{ s.tipo }} · {{ s.id }}</span>
+        {% if s.aggiornato %}<br><small class="muted">Aggiornato: {{ s.aggiornato }}</small>{% endif %}
+        {% if s.storico_count %}<br><small class="muted">{{ s.storico_count }} snapshot in storico</small>{% endif %}
+      </div>
+      <div class="session-actions">
+        <a href="{{ url_for('home.open_session', session_id=s.id) }}" class="btn btn-small">Apri</a>
+        <a href="{{ url_for('manage.modifica_scrutinio', session_id=s.id) }}" class="btn btn-small btn-secondary">Modifica</a>
+        {% if s.storico_count %}
+        <a href="{{ url_for('manage.gestione_storico', session_id=s.id) }}" class="btn btn-small btn-secondary">Storico</a>
+        {% endif %}
+        <form method="post" action="{{ url_for('manage.elimina_scrutinio', session_id=s.id) }}" class="form-inline" onsubmit="return confirm('Eliminare definitivamente questo scrutinio?');">
+          <button type="submit" class="btn btn-small btn-danger">Elimina</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<div class="card">
+  <p>Nessuno scrutinio salvato. Crea il primo con il pulsante sopra.</p>
+</div>
+{% endif %}
+{% endblock %}

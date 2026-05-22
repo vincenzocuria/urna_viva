@@ -1,0 +1,13 @@
+<nav class="tabs">
+  <a href="{{ url_for('scrutiny.dashboard', session_id=scr.id) }}" {% if active == 'dashboard' %}class="active"{% endif %}>Dashboard</a>
+  <a href="{{ url_for('dettaglio.pagina_dettaglio', session_id=scr.id) }}" {% if active == 'dettaglio' %}class="active"{% endif %}>Dettaglio sezioni</a>
+  <a href="{{ url_for('scrutiny.inserimento', session_id=scr.id) }}" {% if active == 'inserimento' %}class="active"{% endif %}>Inserimento</a>
+  <a href="{{ url_for('candidati.modifica_candidati', session_id=scr.id) }}">Candidati</a>
+  <a href="{{ url_for('logo.logo_settings', session_id=scr.id) }}" {% if active == 'logo' %}class="active"{% endif %}>Logo</a>
+  <a href="{{ url_for('display.proiezione_tv', session_id=scr.id) }}" target="_blank" rel="noopener" class="tab-tv">TV ↗</a>
+  <a href="{{ url_for('export.export_xlsx', session_id=scr.id) }}">Excel</a>
+  <a href="{{ url_for('export.export_pdf', session_id=scr.id) }}">PDF</a>
+  <a href="{{ url_for('manage.modifica_scrutinio', session_id=scr.id) }}">Modifica</a>
+  <a href="{{ url_for('manage.gestione_storico', session_id=scr.id) }}">Storico</a>
+  <a href="{{ url_for('home.index') }}">Home</a>
+</nav>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <div>
+      <h1>{{ app_name }}</h1>
+      <p>{{ app_tagline }}</p>
+      </div>
+      <a href="{{ url_for('settings.impostazioni') }}" class="btn btn-secondary btn-small header-settings">Impostazioni</a>
+    </header>
+    {% block nav %}{% endblock %}
+    {% block content %}{% endblock %}
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

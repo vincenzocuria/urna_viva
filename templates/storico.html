@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Storico snapshot — {{ scr.meta.comune }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Storico snapshot — {{ scr.meta.comune }}</h2>
+  <p class="muted">ID {{ scr.id }} · Snapshot salvati dall'inserimento cumulativo</p>
+  <p>
+    <a href="{{ url_for('scrutiny.dashboard', session_id=scr.id) }}" class="btn btn-secondary btn-small">Dashboard</a>
+    <a href="{{ url_for('home.index') }}" class="btn btn-secondary btn-small">Home</a>
+  </p>
+</div>
+
+{% if scr.storico %}
+<div class="card">
+  <form method="post" onsubmit="return confirm('Eliminare tutti gli snapshot?');">
+    <input type="hidden" name="action" value="svuota">
+    <button type="submit" class="btn btn-danger btn-small">Svuota tutto lo storico</button>
+  </form>
+</div>
+<ul class="storico-list">
+  {% for snap in scr.storico|reverse %}
+  {% set idx = (scr.storico|length) - loop.index %}
+  <li class="card storico-item">
+    <div class="storico-head">
+      <strong>{{ snap.timestamp }}</strong>
+      {% if snap.proiezione %}
+      <span class="muted">· Avanzamento {{ snap.proiezione.avanzamento_pct }}%</span>
+      {% endif %}
+    </div>
+    {% if snap.proiezione and snap.proiezione.esito %}
+    <p class="muted">{{ snap.proiezione.esito.messaggio }}</p>
+    {% endif %}
+    <form method="post" class="storico-nota-form">
+      <input type="hidden" name="action" value="modifica_nota">
+      <input type="hidden" name="index" value="{{ idx }}">
+      <label>Nota</label>
+      <input type="text" name="nota" value="{{ snap.nota or '' }}" placeholder="Es. ore 22:15">
+      <button type="submit" class="btn btn-small">Salva nota</button>
+    </form>
+    <form method="post" class="form-inline" onsubmit="return confirm('Eliminare questo snapshot?');">
+      <input type="hidden" name="action" value="elimina">
+      <input type="hidden" name="index" value="{{ idx }}">
+      <button type="submit" class="btn btn-small btn-danger">Elimina snapshot</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="card">
+  <p>Nessuno snapshot in storico. Attiva «Salva snapshot nello storico» nel form cumulativo.</p>
+</div>
+{% endif %}
+{% endblock %}

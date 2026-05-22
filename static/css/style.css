@@ -1,0 +1,248 @@
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --border: #2d3a4f;
+  --text: #e7ecf3;
+  --muted: #8b9cb3;
+  --accent: #3b82f6;
+  --ok: #22c55e;
+  --warn: #eab308;
+  --err: #ef4444;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.wrap { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+
+header.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+header h1 { margin: 0; font-size: 1.4rem; }
+header p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9rem; }
+
+nav.tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+nav.tabs a {
+  color: var(--text);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+nav.tabs a:hover, nav.tabs a.active { background: var(--accent); border-color: var(--accent); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+label { display: block; margin-bottom: 0.25rem; color: var(--muted); font-size: 0.85rem; }
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+@media (max-width: 700px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+.dettaglio-riepilogo > div {
+  padding: 0.5rem 0;
+}
+.table-scroll { overflow-x: auto; }
+.table-dettaglio { font-size: 0.82rem; white-space: nowrap; }
+.table-dettaglio th { position: sticky; top: 0; background: var(--card); }
+.row-inattiva { opacity: 0.55; }
+.badge-zona {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  background: rgba(139, 92, 246, 0.25);
+  border-radius: 4px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: #fff;
+  background: var(--accent);
+}
+.btn-secondary { background: var(--border); }
+.btn-small { padding: 0.35rem 0.7rem; font-size: 0.85rem; }
+
+.alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+.alert-error { background: rgba(239,68,68,0.15); border: 1px solid var(--err); }
+.alert-warn { background: rgba(234,179,8,0.12); border: 1px solid var(--warn); }
+.alert-ok { background: rgba(34,197,94,0.12); border: 1px solid var(--ok); }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; }
+
+.progress {
+  height: 12px;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.badge-vittoria { background: var(--ok); color: #000; }
+.badge-ballottaggio { background: var(--warn); color: #000; }
+.badge-incerto { background: var(--border); }
+
+.session-list { list-style: none; padding: 0; }
+.session-list li,
+.session-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.session-info { flex: 1; min-width: 180px; }
+.session-meta { color: var(--muted); font-weight: normal; }
+.session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+.form-inline { display: inline; margin: 0; }
+.btn-danger {
+  background: #b91c1c;
+}
+.btn-danger:hover { background: #dc2626; }
+.storico-list { list-style: none; padding: 0; }
+.storico-item { margin-bottom: 0.75rem; }
+.storico-head { margin-bottom: 0.5rem; }
+.storico-nota-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin: 0.75rem 0;
+}
+.storico-nota-form input[type="text"] { flex: 1; min-width: 160px; margin-bottom: 0; }
+
+.section-form { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-tv {
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  white-space: nowrap;
+}
+.btn-tv:hover { filter: brightness(1.1); }
+
+nav.tabs a.tab-tv {
+  border-color: #7c3aed;
+  color: #c4b5fd;
+}
+
+.logo-preview-box {
+  width: 160px;
+  height: 160px;
+  border-radius: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.logo-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.crop-container {
+  max-height: 400px;
+  overflow: hidden;
+  background: #000;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+.muted { color: var(--muted); }
+
+.sync-riepilogo {
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 6px;
+}
+.sync-riepilogo.sync-warn {
+  background: rgba(234, 179, 8, 0.12);
+  color: #fde047;
+}
+
+.totale-elettori-box {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.totale-elettori-val {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: 0.35rem;
+}
+.sezione-row { margin-bottom: 0.5rem; }

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Impostazioni{% endblock %}
+{% block nav %}
+<nav class="tabs">
+  <a href="{{ url_for('home.index') }}">Home</a>
+  <a href="{{ url_for('settings.impostazioni') }}" class="active">Impostazioni</a>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Impostazioni</h2>
+  {% if saved %}
+  <div class="alert alert-ok">Impostazioni salvate.</div>
+  {% endif %}
+  <form method="post">
+    <label for="elettori_sezione_default">Elettori per sezione (valore predefinito)</label>
+    <p class="muted">Usato quando aggiungi nuove sezioni nel wizard «Nuovo scrutinio».</p>
+    <input
+      type="number"
+      id="elettori_sezione_default"
+      name="elettori_sezione_default"
+      value="{{ cfg.elettori_sezione_default }}"
+      min="1"
+      required
+    >
+    <p style="margin-top:1.25rem">
+      <button type="submit" class="btn">Salva impostazioni</button>
+      <a href="{{ url_for('home.index') }}" class="btn btn-secondary">Indietro</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

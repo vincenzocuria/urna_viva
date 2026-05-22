@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Modifica — {{ scr.meta.comune }}{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Modifica scrutinio</h2>
+  <p class="muted">ID {{ scr.id }} · I voti inseriti restano salvati. Puoi cambiare comune, abitanti e configurazione sezioni.</p>
+  {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+  <form method="post" id="modifica-form">
+    <label for="comune">Comune *</label>
+    <input type="text" id="comune" name="comune" value="{{ scr.meta.comune }}" required>
+
+    <label for="abitanti">Abitanti (opzionale)</label>
+    <input type="number" id="abitanti" name="abitanti" value="{{ scr.meta.abitanti or '' }}" min="0">
+
+    <p class="muted">Tipo elezione: <strong>{{ scr.meta.tipo }}</strong> (non modificabile)</p>
+
+    <h3>Sezioni elettorali</h3>
+    <p class="muted">Zona (es. Centro, Nord) migliora la proiezione per le sezioni non ancora arrivate.</p>
+    <div id="sezioni-edit-container">
+      {% for sec in scr.sezioni %}
+      <div class="sezione-row grid-3">
+        <input type="hidden" name="sezione_id[]" value="{{ sec.id }}">
+        <div>
+          <label>Nome sezione</label>
+          <input type="text" name="sezione_nome[]" value="{{ sec.nome }}" required>
+        </div>
+        <div>
+          <label>Zona</label>
+          <input type="text" name="sezione_zona[]" value="{{ sec.zona or '' }}" placeholder="Centro, Nord…">
+        </div>
+        <div>
+          <label>Elettori</label>
+          <input type="number" name="sezione_elettori[]" value="{{ sec.elettori }}" min="1">
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p style="margin-top:1.25rem">
+      <button type="submit" class="btn">Salva modifiche</button>
+      <a href="{{ url_for('home.index') }}" class="btn btn-secondary">Annulla</a>
+      <a href="{{ url_for('scrutiny.dashboard', session_id=scr.id) }}" class="btn btn-secondary">Dashboard</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

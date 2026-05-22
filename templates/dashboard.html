@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — {{ scr.meta.comune }}{% endblock %}
+{% block nav %}
+{% with active='dashboard' %}
+{% include 'includes/nav_scrutinio.html' %}
+{% endwith %}
+{% endblock %}
+{% block content %}
+<div class="card card-header-comune">
+  <div class="header-row">
+    <div>
+      <h2>{{ scr.meta.comune }}</h2>
+      <p>{{ proiezione.tipo_label }} · ID {{ scr.id }} · Modalità: {{ scr.modalita_inserimento }}</p>
+      <p><strong>{{ scr.meta.elettori_totale or proiezione.schede_totali }}</strong> elettori totali (somma sezioni)</p>
+    </div>
+    <a href="{{ url_for('display.proiezione_tv', session_id=scr.id) }}" target="_blank" class="btn btn-tv" rel="noopener">Apri Proiezione TV ↗</a>
+  </div>
+  {% if not validazione.valid %}
+  <div class="alert alert-error">
+    <strong>Errori dati:</strong>
+    <ul>{% for e in validazione.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+  {% if validazione.warnings %}
+  <div class="alert alert-warn">
+    {% for w in validazione.warnings %}{{ w }}{% if not loop.last %}; {% endif %}{% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Avanzamento scrutinio</h3>
+  <div class="progress">
+    <div class="progress-bar" style="width: {{ proiezione.avanzamento_pct }}%"></div>
+  </div>
+  <p>{{ proiezione.schede_scrutinate }} / {{ proiezione.schede_totali }} schede ({{ proiezione.avanzamento_pct }}%)</p>
+  <p><small>{{ proiezione.metodo_label }}</small></p>
+  <p style="margin-top:0.5rem">
+    <a href="{{ url_for('dettaglio.pagina_dettaglio', session_id=scr.id) }}" class="btn btn-small btn-secondary">Dettaglio sezioni (zone, nulli, bianche) →</a>
+  </p>
+</div>
+
+<div class="card">
+  <h3>Schede proiettate (stima)</h3>
+  <div class="grid-2 dettaglio-riepilogo">
+    <div>Nulli proj.: <strong>{{ proiezione.nulli_proiettati or 0 }}</strong></div>
+    <div>Bianche proj.: <strong>{{ proiezione.bianche_proiettate or 0 }}</strong></div>
+    <div>Contestati proj.: <strong>{{ proiezione.contestati_proiettati or 0 }}</strong></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Esito proiettato</h3>
+  {% set es = proiezione.esito %}
+  <span class="badge {% if es.stato == 'vittoria_primo_turno' %}badge-vittoria{% elif es.stato == 'ballottaggio' %}badge-ballottaggio{% else %}badge-incerto{% endif %}">
+    {{ es.messaggio }}
+  </span>
+  {% if es.ballottaggio %}
+  <p style="margin-top:0.75rem">Ballottaggio tra:
+    {% for b in es.ballottaggio %}
+    <strong>{{ b.nome_display if b.nome_display is defined else b.nome }}</strong> ({{ b.pct_proiettate }}%){% if not loop.last %} e {% endif %}
+    {% endfor %}
+  </p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h3>Candidati</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Candidato</th>
+        <th>Voti reali</th>
+        <th>%</th>
+        <th>Voti proiettati</th>
+        <th>% proj.</th>
+        <th>Δ soglia 50%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in proiezione.candidati %}
+      <tr>
+        <td>
+          {% if c.lista %}<small>{{ c.lista }}</small><br>{% endif %}
+          {{ c.nome }}
+        </td>
+        <td>{{ c.voti_reali }}</td>
+        <td>{{ c.pct_reali }}%</td>
+        <td>{{ c.voti_proiettati }}</td>
+        <td>{{ c.pct_proiettate }}%</td>
+        <td>{{ c.delta_soglia }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <p class="alert-warn" style="padding:0.5rem;border-radius:6px">
+    Proiezione indicativa, non ufficiale. Non sostituisce il verbale di seggio.
+  </p>
+  <label>Confronta metodo proiezione:</label>
+  <select id="metodo-select">
+    <option value="">Automatico ({{ scr.modalita_inserimento }})</option>
+    <option value="pesata">Pesata per sezione</option>
+    <option value="cumulativo">Cumulativa</option>
+  </select>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('metodo-select')?.addEventListener('change', async function() {
+  const v = this.value;
+  const url = '{{ url_for("scrutiny.api_proiezione", session_id=scr.id) }}' + (v ? '?metodo=' + v : '');
+  const r = await fetch(url);
+  const d = await r.json();
+  console.log('Proiezione aggiornata', d);
+  if (v) location.reload();
+});
+</script>
+{% endblock %}
