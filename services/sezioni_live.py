@@ -1,32 +1,34 @@
+from services.sezione_live_dettaglio import enrich_sezione_live
+
+
+def stima_schede_votate_finale(session: dict) -> dict:
+    sezioni = session.get("sezioni", [])
+    elett_tot = sum(int(s.get("elettori", 0)) for s in sezioni)
+    arrivate = sum(int(s.get("schede_scrutinate", 0)) for s in sezioni)
+    elett_con_arrivo = sum(
+        int(s.get("elettori", 0))
+        for s in sezioni
+        if int(s.get("schede_scrutinate", 0)) > 0
+    )
+    sezioni_con_arrivo = sum(
+        1 for s in sezioni if int(s.get("schede_scrutinate", 0)) > 0
+    )
+    completo = elett_tot > 0 and elett_con_arrivo >= elett_tot
+    if elett_con_arrivo <= 0 or elett_tot <= 0:
+        stima = arrivate
+    elif completo:
+        stima = arrivate
+    else:
+        stima = round(arrivate * elett_tot / elett_con_arrivo)
+    return {
+        "arrivate": arrivate,
+        "stima_finale": stima,
+        "elettori": elett_tot,
+        "completo": completo,
+        "sezioni_con_arrivo": sezioni_con_arrivo,
+        "sezioni_totali": len(sezioni),
+    }
+
+
 def build_sezioni_live(session: dict) -> list:
-    candidati = {c["id"]: c for c in session.get("candidati", [])}
-    out = []
-    for sec in session.get("sezioni", []):
-        vv = sec.get("voti_validi", 0)
-        voti = sec.get("voti", {}) or {}
-        leader_id = None
-        leader_voti = 0
-        if vv > 0 and voti:
-            leader_id = max(voti.keys(), key=lambda k: voti.get(k, 0))
-            leader_voti = voti.get(leader_id, 0)
-        elett = int(sec.get("elettori", 0))
-        scrut = int(sec.get("schede_scrutinate", 0))
-        leader = candidati.get(leader_id) if leader_id else None
-        leader_nome = leader["nome"] if leader else None
-        if leader and leader.get("lista"):
-            leader_nome = f"{leader['lista']} — {leader['nome']}"
-        pct_leader = round(100.0 * leader_voti / vv, 1) if vv else 0.0
-        out.append(
-            {
-                "id": sec.get("id"),
-                "nome": sec.get("nome", f"Sezione {sec.get('id')}"),
-                "elettori": elett,
-                "schede_scrutinate": scrut,
-                "voti_validi": vv,
-                "avanzamento_pct": round(100.0 * scrut / elett, 1) if elett else 0.0,
-                "leader_nome": leader_nome,
-                "leader_pct": pct_leader,
-                "ha_dati": scrut > 0,
-            }
-        )
-    return out
+    return [enrich_sezione_live(sec, session) for sec in session.get("sezioni", [])]

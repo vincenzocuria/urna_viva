@@ -22,12 +22,27 @@ def update_meta(session: dict, comune: str, abitanti: str | None) -> None:
         session["meta"]["abitanti"] = None
 
 
+def _next_sezione_id(old_by_id: dict, used_ids: set) -> str:
+    all_ids = set(old_by_id.keys()) | used_ids
+    nums = [int(k) for k in all_ids if str(k).isdigit()]
+    n = max(nums + [0]) + 1
+    while str(n) in all_ids:
+        n += 1
+    used_ids.add(str(n))
+    return str(n)
+
+
 def update_sezioni_config(session: dict, sezioni_input: list) -> None:
     old_by_id = {s["id"]: s for s in session.get("sezioni", [])}
     candidati_ids = [c["id"] for c in session["candidati"]]
+    used_ids: set[str] = set()
     nuove = []
     for i, s in enumerate(sezioni_input):
-        sid = s.get("id") or str(i + 1)
+        sid = str(s.get("id") or "").strip()
+        if not sid or sid in used_ids:
+            sid = _next_sezione_id(old_by_id, used_ids)
+        else:
+            used_ids.add(sid)
         old = old_by_id.get(sid, {})
         nuove.append(
             {

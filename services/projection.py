@@ -61,8 +61,12 @@ def _proietta_schede_altri(
 
 
 def project_weighted(session: dict) -> dict:
-    candidati_ids = [c["id"] for c in session["candidati"]]
     agg = _aggregate_from_sections(session)
+    if session.get("meta", {}).get("tipo") == "liste":
+        from services.projection_liste import project_weighted_liste
+
+        return project_weighted_liste(session, agg)
+    candidati_ids = [c["id"] for c in session["candidati"]]
     tot = agg["tot"]
     voti_reali = agg["voti_reali"]
     voti_proiettati = {cid: 0.0 for cid in candidati_ids}

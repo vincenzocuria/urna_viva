@@ -42,8 +42,17 @@
               </div>
             </div>
             <div class="scrutinio-meta">
+              <p class="schede-votate-label">Schede votate</p>
+              <p class="schede-votate-num">
+                <span id="schede-votate-arrivate">0</span>
+              </p>
+              <p class="schede-finale-line hidden" id="schede-finale-wrap">
+                <span id="schede-finale-prefix">Stima finale</span>
+                <strong id="schede-votate-finale">0</strong>
+              </p>
               <p class="schede-count">
-                <span id="schede-scrutinate">0</span> / <span id="schede-totali">0</span>
+                su <span id="schede-totali">0</span> elettori
+                · <span id="sezioni-arrivo-label">0/0 sezioni</span>
               </p>
               <div class="progress-track">
                 <div class="progress-fill" id="progress-fill"></div>
@@ -69,7 +78,14 @@
       </aside>
 
       <section class="panel candidati-panel">
-        <h2 class="candidati-title">Candidati</h2>
+        <div class="candidati-panel-head">
+          <h2 class="candidati-title" id="candidati-title">Candidati</h2>
+          <button type="button" id="btn-preferenze" class="btn-sezioni-expand" hidden>
+            Preferenze consiglieri
+          </button>
+        </div>
+        <div id="alert-sindaco" class="alert-sindaco hidden" role="status"></div>
+        <div id="sindaco-confronto" class="sindaco-confronto hidden"></div>
         <div id="candidati-list" class="candidati-list"></div>
       </section>
     </main>
@@ -82,6 +98,27 @@
         <button type="button" class="btn-overlay-close" id="btn-overlay-chiudi" aria-label="Chiudi">✕</button>
       </header>
       <div id="sezioni-overlay-grid" class="sezioni-overlay-grid"></div>
+    </div>
+  </div>
+  <div id="sezione-dettaglio-overlay" class="sezioni-overlay sezione-dettaglio-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sezione-dettaglio-title">
+    <div class="sezioni-overlay-backdrop" id="sezione-dettaglio-close"></div>
+    <div class="sezioni-overlay-box sezione-dettaglio-box">
+      <header class="sezioni-overlay-header sezione-dettaglio-header">
+        <button type="button" class="btn-overlay-back" id="btn-sezione-indietro" aria-label="Indietro">←</button>
+        <h2 id="sezione-dettaglio-title">Sezione</h2>
+        <button type="button" class="btn-overlay-close" id="btn-sezione-dettaglio-chiudi" aria-label="Chiudi">✕</button>
+      </header>
+      <div id="sezione-dettaglio-body" class="sezione-dettaglio-body"></div>
+    </div>
+  </div>
+  <div id="preferenze-overlay" class="sezioni-overlay preferenze-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="overlay-preferenze-title">
+    <div class="sezioni-overlay-backdrop" id="preferenze-overlay-close"></div>
+    <div class="sezioni-overlay-box preferenze-overlay-box">
+      <header class="sezioni-overlay-header">
+        <h2 id="overlay-preferenze-title">Preferenze consiglieri</h2>
+        <button type="button" class="btn-overlay-close" id="btn-preferenze-chiudi" aria-label="Chiudi">✕</button>
+      </header>
+      <div id="preferenze-overlay-body" class="preferenze-overlay-body"></div>
     </div>
   </div>
   <footer class="display-footer">

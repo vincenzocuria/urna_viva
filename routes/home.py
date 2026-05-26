@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, session, url_for
 
 from services.app_settings import elettori_sezione_default
+from services.liste_candidati import normalize_candidati
 from services.session_store import list_sessions, load, new_session, save
 
 home_bp = Blueprint("home", __name__)
@@ -62,7 +63,7 @@ def setup():
                 elettori_default=elettori_sezione_default(),
             )
         ab = int(abitanti) if abitanti.isdigit() else None
-        scr = new_session(comune, tipo, candidati, sezioni, ab)
+        scr = new_session(comune, tipo, normalize_candidati(candidati), sezioni, ab)
         save(scr)
         session["scrutiny_id"] = scr["id"]
         return redirect(url_for("scrutiny.dashboard", session_id=scr["id"]))

@@ -24,6 +24,7 @@ def new_session(
             "id": c.get("id") or str(i + 1),
             "nome": c["nome"].strip(),
             "lista": c.get("lista", "").strip(),
+            "capolista": bool(c.get("capolista")),
         }
         for i, c in enumerate(candidati)
     ]

@@ -52,8 +52,14 @@ def modifica_scrutinio(session_id):
             sezioni_in.append(
                 {"id": sid, "nome": nome, "zona": zona, "elettori": elettori}
             )
-        if sezioni_in:
-            update_sezioni_config(scr, sezioni_in)
+        if not sezioni_in:
+            return render_template(
+                "modifica_scrutinio.html",
+                scr=scr,
+                error="Inserisci almeno una sezione elettorale",
+                elettori_default=elettori_sezione_default(),
+            )
+        update_sezioni_config(scr, sezioni_in)
         save(scr)
         return redirect(url_for("scrutiny.dashboard", session_id=session_id))
     return render_template(

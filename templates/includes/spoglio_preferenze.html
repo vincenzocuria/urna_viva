@@ -1,0 +1,90 @@
+        <div class="sindaco-liste-box">
+          <h4>Preferenze di lista</h4>
+          <p class="muted sindaco-liste-desc">
+            Ogni elettore vale <strong>1 voto di lista</strong>. Il <strong>totale lista</strong> =
+            preferenze consiglieri + capolista ★ (voti <em>senza preferenza</em>).
+            Esempio verbale: consiglieri <strong>155</strong> + capolista <strong>18</strong> = <strong>173</strong>
+            — non aggiungere 18 se hai già messo 173 sui consiglieri.
+          </p>
+        </div>
+
+        <details class="pref-collapsible" open>
+          <summary class="pref-collapsible-summary">
+            <span>Candidati per lista</span>
+            <span class="pref-summary-liste muted"></span>
+          </summary>
+          <div class="preferenze-grid">
+            {% for gruppo in liste_gruppi %}
+            <div class="lista-pref-block" data-lista="{{ gruppo.nome }}">
+              <h5>{{ gruppo.nome }}</h5>
+              <div class="lista-verbale-bar">
+                <label class="lista-verbale-label">
+                  <span class="muted">Totale dal verbale</span>
+                  <input
+                    type="number"
+                    min="0"
+                    name="lista_verbale__{{ gruppo.nome }}"
+                    value="{{ liste_verbale.get(gruppo.nome, '') }}"
+                    class="lista-verbale-input"
+                    placeholder="es. 173"
+                  >
+                </label>
+                <button type="button" class="btn btn-secondary btn-small btn-cap-da-verbale">
+                  Capolista = verbale − consiglieri
+                </button>
+              </div>
+              <table class="pref-table pref-inserimento">
+                <thead>
+                  <tr><th>Candidato</th><th>Preferenze</th></tr>
+                </thead>
+                <tbody>
+                  {% for c in gruppo.candidati %}
+                  <tr data-capolista="{{ '1' if c.capolista else '0' }}">
+                    <td>
+                      {{ c.nome }}
+                      {% if c.capolista %}<span class="capolista-tag">★ senza pref.</span>{% endif %}
+                    </td>
+                    <td>
+                      <input type="number" name="voto_{{ c.id }}" value="{{ target_voti[c.id] }}" min="0" class="pref-input" data-lista="{{ gruppo.nome }}">
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr class="lista-sub-row">
+                    <td class="muted">Preferenze consiglieri</td>
+                    <td class="lista-sub-consiglieri">0</td>
+                  </tr>
+                  <tr class="lista-sub-row">
+                    <td class="muted">Capolista ★ (senza pref.)</td>
+                    <td class="lista-sub-capolista">0</td>
+                  </tr>
+                  <tr class="lista-totale-row">
+                    <td><strong>= Totale lista (sindaco)</strong></td>
+                    <td><strong class="lista-totale-pref" data-lista="{{ gruppo.nome }}">0</strong></td>
+                  </tr>
+                  <tr class="lista-verbale-diff-row hidden">
+                    <td class="muted">Rispetto al verbale</td>
+                    <td class="lista-verbale-diff"></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="pref-riepilogo-box pref-riepilogo-liste">
+            <div>
+              <span class="muted">Lista 1 + Lista 2 (inserito)</span><br>
+              <strong class="pref-totale-globale">0</strong>
+            </div>
+            <div>
+              <span class="muted">Voti validi sezione</span><br>
+              <strong class="pref-voti-validi">0</strong>
+            </div>
+            <div class="pref-bilancio-cell">
+              <span class="muted pref-bilancio-label">Bilancio</span><br>
+              <strong class="pref-rimanenti">0</strong>
+              <p class="pref-bilancio-hint muted"></p>
+            </div>
+          </div>
+        </details>

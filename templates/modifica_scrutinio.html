@@ -5,7 +5,12 @@
   <h2>Modifica scrutinio</h2>
   <p class="muted">ID {{ scr.id }} · I voti inseriti restano salvati. Puoi cambiare comune, abitanti e configurazione sezioni.</p>
   {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
-  <form method="post" id="modifica-form">
+  <form
+    method="post"
+    id="modifica-form"
+    data-elettori-default="{{ elettori_default }}"
+    data-initial-sezioni='{{ scr.sezioni | tojson }}'
+  >
     <label for="comune">Comune *</label>
     <input type="text" id="comune" name="comune" value="{{ scr.meta.comune }}" required>
 
@@ -15,26 +20,14 @@
     <p class="muted">Tipo elezione: <strong>{{ scr.meta.tipo }}</strong> (non modificabile)</p>
 
     <h3>Sezioni elettorali</h3>
-    <p class="muted">Zona (es. Centro, Nord) migliora la proiezione per le sezioni non ancora arrivate.</p>
-    <div id="sezioni-edit-container">
-      {% for sec in scr.sezioni %}
-      <div class="sezione-row grid-3">
-        <input type="hidden" name="sezione_id[]" value="{{ sec.id }}">
-        <div>
-          <label>Nome sezione</label>
-          <input type="text" name="sezione_nome[]" value="{{ sec.nome }}" required>
-        </div>
-        <div>
-          <label>Zona</label>
-          <input type="text" name="sezione_zona[]" value="{{ sec.zona or '' }}" placeholder="Centro, Nord…">
-        </div>
-        <div>
-          <label>Elettori</label>
-          <input type="number" name="sezione_elettori[]" value="{{ sec.elettori }}" min="1">
-        </div>
-      </div>
-      {% endfor %}
-    </div>
+    <p class="muted">Cambia il numero di sezioni, rinomina ogni sezione, indica zona (es. Centro, Nord) e gli elettori. Le sezioni rimosse perdono i voti associati.</p>
+    <label for="n_sezioni">Numero sezioni</label>
+    <input type="number" id="n_sezioni" name="n_sezioni" value="{{ scr.sezioni|length }}" min="1" max="200">
+    <div id="sezioni-container"></div>
+    <p class="totale-elettori-box">
+      <strong>Totale elettori:</strong>
+      <span id="totale-elettori" class="totale-elettori-val">0</span>
+    </p>
 
     <p style="margin-top:1.25rem">
       <button type="submit" class="btn">Salva modifiche</button>
@@ -43,4 +36,8 @@
     </p>
   </form>
 </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sezioni-editor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modifica-sezioni.js') }}"></script>
 {% endblock %}

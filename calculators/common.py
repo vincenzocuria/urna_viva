@@ -18,11 +18,33 @@ def esito_elezione(voti_proiettati: list, voti_validi_totali: float, avanzamento
     sorted_c = sorted(voti_proiettati, key=lambda x: x["voti_proiettati"], reverse=True)
     top = sorted_c[0]
     quota = top["voti_proiettati"] / voti_validi_totali
-    soglia = SOGLIA_VITTORIA + (1 / voti_validi_totali if voti_validi_totali else 0)
-    if quota > SOGLIA_VITTORIA:
+    n = len(sorted_c)
+    ballottaggio = []
+    vincitore_id = None
+
+    if n == 2:
+        second = sorted_c[1]
+        if top["voti_proiettati"] == second["voti_proiettati"]:
+            stato = "incerto"
+            messaggio = "Parità assoluta tra i due candidati"
+        elif avanzamento >= SCRUTINIO_INCERTO_SOGLIA:
+            stato = "vittoria_primo_turno"
+            messaggio = (
+                f"Vittoria: {top['nome']}"
+                if quota > SOGLIA_VITTORIA
+                else f"In vantaggio: {top['nome']}"
+            )
+            vincitore_id = top["id"]
+        else:
+            stato = "incerto"
+            messaggio = (
+                f"Scrutinio al {round(avanzamento * 100, 1)}% — "
+                f"{top['nome']} in vantaggio (con 2 candidati non è previsto il ballottaggio)"
+            )
+    elif quota > SOGLIA_VITTORIA:
         stato = "vittoria_primo_turno"
         messaggio = f"Vittoria al primo turno: {top['nome']}"
-        ballottaggio = []
+        vincitore_id = top["id"]
     else:
         stato = "ballottaggio"
         messaggio = (
@@ -30,13 +52,18 @@ def esito_elezione(voti_proiettati: list, voti_validi_totali: float, avanzamento
             "(secondo turno non simulato: possibili spostamenti di voto)"
         )
         ballottaggio = sorted_c[:2]
-    if avanzamento < SCRUTINIO_INCERTO_SOGLIA and stato != "vittoria_primo_turno":
+
+    if (
+        avanzamento < SCRUTINIO_INCERTO_SOGLIA
+        and stato != "vittoria_primo_turno"
+        and n != 2
+    ):
         stato = "incerto"
         messaggio = f"Scrutinio al {round(avanzamento * 100, 1)}% - esito ancora incerto"
     return {
         "stato": stato,
         "messaggio": messaggio,
-        "vincitore_id": top["id"] if stato == "vittoria_primo_turno" else None,
+        "vincitore_id": vincitore_id,
         "ballottaggio": ballottaggio,
         "soglia_pct": round(SOGLIA_VITTORIA * 100, 2),
     }
